@@ -193,15 +193,15 @@ class G1Cfg( LeggedRobotCfg ):
     class rewards( LeggedRobotCfg.rewards ):
         soft_dof_pos_limit = 0.9
         soft_dof_vel_limit = 0.9
-        base_height_target = 0.75
+        base_height_target = 0.35 #0.75
         only_positive_rewards = False # if true negative total rewards are clipped at zero (avoids early termination problems)
         orientation_sigma = 1
         is_gaussian = True
         target_head_height = 1
         target_head_margin = 1
-        target_base_height_phase1 = 0.45
-        target_base_height_phase2 = 0.45
-        target_base_height_phase3 = 0.65
+        target_base_height_phase1 = 0.05 #0.45
+        target_base_height_phase2 = 0.05 #0.45
+        target_base_height_phase3 = 0.3 #0.65
         orientation_threshold = 0.99
         left_foot_displacement_sigma = -2
         right_foot_displacement_sigma = -2

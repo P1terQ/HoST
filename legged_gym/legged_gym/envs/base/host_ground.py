@@ -492,10 +492,42 @@ class LeggedRobot(BaseTask):
         if self.custom_origins:
             self.root_states[env_ids] = self.base_init_state
             self.root_states[env_ids, :3] += self.env_origins[env_ids]
-            self.root_states[env_ids, :2] += torch_rand_float(-1., 1., (len(env_ids), 2), device=self.device) # xy position within 1m of the center
+            # self.root_states[env_ids, :2] += torch_rand_float(-1., 1., (len(env_ids), 2), device=self.device) # xy position within 1m of the center
+            self.root_states[env_ids, :2] += torch_rand_float(-2., 2., (len(env_ids), 2), device=self.device) # xy position within 1m of the center
         else:
             self.root_states[env_ids] = self.base_init_state
             self.root_states[env_ids, :3] += self.env_origins[env_ids]
+
+        #! postive和negative两种可能性reset
+        random_env_floats = torch.rand(len(env_ids), device=self.device)
+        positive_envs = env_ids[random_env_floats <= 0.2]
+        negative_envs = env_ids[0.2 <= random_env_floats]
+
+
+        #! negative
+        self.root_states[negative_envs, 2] += torch.rand(len(negative_envs), device=self.device, requires_grad=False).mul(0.2).add(0.1)
+        self.root_states[negative_envs, 3:7] = quat_from_euler_xyz(torch.rand(len(negative_envs), device=self.device, requires_grad=False).mul(np.pi).sub(np.pi / 2), 
+                                                             torch.rand(len(negative_envs), device=self.device, requires_grad=False).mul(np.pi / 3).add(np.pi * 5 / 6), 
+                                                             torch.rand(len(negative_envs), device=self.device, requires_grad=False).mul(np.pi * 2).sub(np.pi))   
+
+        #! positive
+        self.root_states[positive_envs, 2] += torch.rand(len(positive_envs), device=self.device, requires_grad=False).mul(0.2).add(0.3)
+        self.root_states[positive_envs, 3:7] = quat_from_euler_xyz(torch.rand(len(positive_envs), device=self.device, requires_grad=False).mul(np.pi).sub(np.pi / 2), 
+                                                             torch.rand(len(positive_envs), device=self.device, requires_grad=False).mul(np.pi / 3).sub(np.pi / 6), 
+                                                             torch.rand(len(positive_envs), device=self.device, requires_grad=False).mul(np.pi * 2).sub(np.pi))   
+
+        
+        # rand_rpy = torch_rand_float(-np.pi, np.pi, (len(env_ids), 3), device=self.device)
+        # self.root_states[env_ids, 3:7] = quat_from_euler_xyz(rand_rpy[:, 0], rand_rpy[:, 1], rand_rpy[:, 2])        
+        
+        # vel rand: [7:10]: lin vel, [10:13]: ang vel
+        self.root_states[env_ids, 7:13] = torch_rand_float(-0.5, 0.5, (len(env_ids), 6), device=self.device) 
+
+        env_ids_int32 = env_ids.to(dtype=torch.int32)
+        self.gym.set_actor_root_state_tensor_indexed(self.sim,
+                                                     gymtorch.unwrap_tensor(self.root_states),
+                                                     gymtorch.unwrap_tensor(env_ids_int32), len(env_ids_int32))
+
 
         env_ids_int32 = env_ids.to(dtype=torch.int32)
         self.gym.set_actor_root_state_tensor_indexed(self.sim,

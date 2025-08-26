@@ -1,4 +1,4 @@
-name: host
+name: host_go2
 channels:
   - defaults
 dependencies:
