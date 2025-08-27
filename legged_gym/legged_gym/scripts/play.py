@@ -17,7 +17,7 @@ from multiprocessing import Process, Value
 
 def play(args):
     env_cfg, train_cfg = task_registry.get_cfgs(name=args.task)
-    env_cfg.env.num_envs = min(env_cfg.env.num_envs, 100)
+    env_cfg.env.num_envs = min(env_cfg.env.num_envs, 1)
     env_cfg.terrain.num_rows = 4
     env_cfg.terrain.num_cols = 4
     env_cfg.terrain.curriculum = False
@@ -44,4 +44,8 @@ def play(args):
 
 if __name__ == '__main__':
     args = get_args()
+
+    args.task = 'g1_ground'
+    args.load_run = "/home/ustc/robot/code/recovery-baselines/host_for_go2/legged_gym/logs/g1_ground/Aug26_23-00-02_8-26-0"
+
     play(args)

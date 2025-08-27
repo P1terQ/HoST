@@ -76,6 +76,9 @@ class BaseTask():
             self.gym.subscribe_viewer_keyboard_event(
                 self.viewer, gymapi.KEY_V, "toggle_viewer_sync")
 
+            self.gym.subscribe_viewer_keyboard_event(
+                self.viewer, gymapi.KEY_R, "reset")
+            
         self.free_cam = False
         self.lookat_id = 0
         self.lookat_vec = torch.tensor([2, -2, 1], requires_grad=False, device=self.device)
@@ -144,6 +147,10 @@ class BaseTask():
                 elif evt.action == "toggle_viewer_sync" and evt.value > 0:
                     self.enable_viewer_sync = not self.enable_viewer_sync
                 
+                if evt.action == "reset" and evt.value>0:
+                        # print("RESET: ", self.lookat_id)
+                        self.reset()
+
                 if not self.free_cam:
                     for i in range(9):
                         if evt.action == "lookat" + str(i) and evt.value > 0:

@@ -16,5 +16,6 @@ def train(args):
 if __name__ == '__main__':
     args = get_args()
     args.task = 'g1_ground'
+    args.headless = True
     # args.num_envs = 1
     train(args)

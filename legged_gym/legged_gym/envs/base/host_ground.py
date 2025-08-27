@@ -505,13 +505,15 @@ class LeggedRobot(BaseTask):
 
 
         #! negative
-        self.root_states[negative_envs, 2] += torch.rand(len(negative_envs), device=self.device, requires_grad=False).mul(0.2).add(0.1)
+        # self.root_states[negative_envs, 2] += torch.rand(len(negative_envs), device=self.device, requires_grad=False).mul(0.2).add(0.1)
+        self.root_states[negative_envs, 2] += torch.rand(len(negative_envs), device=self.device, requires_grad=False).mul(0.2)
         self.root_states[negative_envs, 3:7] = quat_from_euler_xyz(torch.rand(len(negative_envs), device=self.device, requires_grad=False).mul(np.pi).sub(np.pi / 2), 
                                                              torch.rand(len(negative_envs), device=self.device, requires_grad=False).mul(np.pi / 3).add(np.pi * 5 / 6), 
                                                              torch.rand(len(negative_envs), device=self.device, requires_grad=False).mul(np.pi * 2).sub(np.pi))   
 
         #! positive
-        self.root_states[positive_envs, 2] += torch.rand(len(positive_envs), device=self.device, requires_grad=False).mul(0.2).add(0.3)
+        # self.root_states[positive_envs, 2] += torch.rand(len(positive_envs), device=self.device, requires_grad=False).mul(0.2).add(0.3)
+        self.root_states[positive_envs, 2] += torch.rand(len(positive_envs), device=self.device, requires_grad=False).mul(0.2)
         self.root_states[positive_envs, 3:7] = quat_from_euler_xyz(torch.rand(len(positive_envs), device=self.device, requires_grad=False).mul(np.pi).sub(np.pi / 2), 
                                                              torch.rand(len(positive_envs), device=self.device, requires_grad=False).mul(np.pi / 3).sub(np.pi / 6), 
                                                              torch.rand(len(positive_envs), device=self.device, requires_grad=False).mul(np.pi * 2).sub(np.pi))   
@@ -1066,7 +1068,7 @@ class LeggedRobot(BaseTask):
         self.gym.refresh_dof_state_tensor(self.sim)
         self.gym.refresh_net_contact_force_tensor(self.sim)
         
-    #-----------------------------task rewards-----------------------------
+    #! -----------------------------task rewards-----------------------------
     def _reward_orientation(self):
         if not self.is_gaussian:
             mse_error = torch.sum(torch.square(self.projected_gravity - torch.tensor([0, 0 ,1], device=self.device)), dim=-1)
@@ -1081,18 +1083,29 @@ class LeggedRobot(BaseTask):
             head_height = self.rigid_body_states[:, self.head_indices, 2].clone()
             return head_height.squeeze(1).clamp(0, 1)
         else:
-            head_height = self.rigid_body_states[:, self.head_indices, 2].clone()
+            # head_height = self.rigid_body_states[:, self.head_indices, 2].clone()
+            # feet_height = self.rigid_body_states[:, self.feet_indices, 2].clone().mean(-1).unsqueeze(-1)
+            # head_height -= feet_height
+            # reward = tolerance(head_height, (self.cfg.rewards.target_head_height, np.inf), self.cfg.rewards.target_head_margin, 0.1)
+            # delta_max_headheight = head_height - self.max_headheight
+            # delta_headheight = head_height - self.old_headheight
+            # self.max_headheight = torch.max(torch.cat((head_height, self.old_headheight), dim=1), dim=1)[0].unsqueeze(-1)
+            # self.old_headheight = head_height
+            # return reward
+
+            base_height = self.rigid_body_states[:, 0, 2].clone().unsqueeze(-1)
             feet_height = self.rigid_body_states[:, self.feet_indices, 2].clone().mean(-1).unsqueeze(-1)
-            head_height -= feet_height
-            reward = tolerance(head_height, (self.cfg.rewards.target_head_height, np.inf), self.cfg.rewards.target_head_margin, 0.1)
-            delta_max_headheight = head_height - self.max_headheight
-            delta_headheight = head_height - self.old_headheight
-            self.max_headheight = torch.max(torch.cat((head_height, self.old_headheight), dim=1), dim=1)[0].unsqueeze(-1)
-            self.old_headheight = head_height
+            base_height -= feet_height
+            reward = tolerance(base_height, (self.cfg.rewards.target_head_height, np.inf), self.cfg.rewards.target_head_margin, 0.1)
+            # delta_max_headheight = base_height - self.max_headheight
+            # delta_headheight = base_height - self.old_headheight
+            self.max_headheight = torch.max(torch.cat((base_height, self.old_headheight), dim=1), dim=1)[0].unsqueeze(-1)
+            self.old_headheight = base_height
+            # print("task base reward: ", reward)
             return reward
+        
 
-
-    #-----------------------------regularization rewards-----------------------------
+    #! -----------------------------regularization rewardgs-----------------------------
     def _reward_dof_acc(self):
         # Penalize dof accelerations
         return torch.sum(torch.square((self.last_dof_vel - self.dof_vel) / self.dt), dim=1)
@@ -1135,7 +1148,7 @@ class LeggedRobot(BaseTask):
         return torch.sum((torch.abs(self.torques) - self.torque_limits*self.cfg.rewards.soft_torque_limit).clip(min=0.), dim=1)
 
 
-    #-----------------------------style rewards-----------------------------
+    #!-----------------------------style rewards-----------------------------
     def _reward_waist_deviation(self):
         wrist_dof = self.dof_pos[:, self.waist_joint_indices]
         reward = (torch.abs(wrist_dof) > 1.4).float()

@@ -99,10 +99,9 @@ class G1Cfg( LeggedRobotCfg ):
         control_type = 'P'
         stiffness = {'joint': 40.0}  # [N*m/rad]
         damping = {'joint': 1.0}     # [N*m*s/rad]
-        action_scale = 0.5
+        action_scale = 0.25 # 和四足的保持一直
         decimation = 20
         # action scale: target angle = actionRescale * action + cur_dof_pos
-        action_scale = 1
         # decimation: Number of control action updates @ sim DT per policy DT
         decimation = 4
 
@@ -197,11 +196,11 @@ class G1Cfg( LeggedRobotCfg ):
         only_positive_rewards = False # if true negative total rewards are clipped at zero (avoids early termination problems)
         orientation_sigma = 1
         is_gaussian = True
-        target_head_height = 1
-        target_head_margin = 1
+        target_head_height = 0.35 #1 改成base_height
+        target_head_margin = 0.35 #1
         target_base_height_phase1 = 0.05 #0.45
         target_base_height_phase2 = 0.05 #0.45
-        target_base_height_phase3 = 0.3 #0.65
+        target_base_height_phase3 = 0.05 #0.65
         orientation_threshold = 0.99
         left_foot_displacement_sigma = -2
         right_foot_displacement_sigma = -2
@@ -214,7 +213,7 @@ class G1Cfg( LeggedRobotCfg ):
 
         class scales:
             task_orientation = 1
-            task_head_height = 0#1
+            task_head_height = 1    # 把head_height改成base_height
 
     class constraints( LeggedRobotCfg.rewards ):
         is_gaussian = True
