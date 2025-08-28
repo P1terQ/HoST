@@ -200,7 +200,7 @@ class G1Cfg( LeggedRobotCfg ):
         target_head_margin = 0.35 #1
         target_base_height_phase1 = 0.05 #0.45
         target_base_height_phase2 = 0.05 #0.45
-        target_base_height_phase3 = 0.05 #0.65
+        target_base_height_phase3 = 0.3 #0.65
         orientation_threshold = 0.99
         left_foot_displacement_sigma = -2
         right_foot_displacement_sigma = -2
@@ -257,7 +257,7 @@ class G1Cfg( LeggedRobotCfg ):
             target_ang_vel_xy = 10
             target_lin_vel_xy = 10
             target_feet_height_var = 0#2.5
-            target_target_upper_dof_pos = 0#10
+            target_target_upper_dof_pos = 10
             target_target_orientation = 10
             target_target_base_height = 10
 
