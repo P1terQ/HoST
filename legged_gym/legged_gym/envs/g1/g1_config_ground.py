@@ -260,6 +260,7 @@ class G1Cfg( LeggedRobotCfg ):
             target_target_upper_dof_pos = 10
             target_target_orientation = 10
             target_target_base_height = 10
+            target_target_hip_pos = 10
 
     class domain_rand:
         use_random = False#True

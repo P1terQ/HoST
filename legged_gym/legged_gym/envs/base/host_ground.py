@@ -1271,3 +1271,11 @@ class LeggedRobot(BaseTask):
         base_height = self.root_states[:, 2]
         standup  = self.root_states[:, 2] > self.cfg.rewards.target_base_height_phase3
         return torch.exp(torch.abs(base_height - self.cfg.rewards.base_height_target) * - 20) * standup
+    
+    def _reward_target_hip_pos(self):
+        # mse = torch.sum(torch.square(self.dof_pos[:, self.upper_body_joint_indices] - self.target_dof_pos[:, self.upper_body_joint_indices]), dim=-1)
+        mse = torch.sum(torch.square(self.dof_pos[:,[0, 3, 6, 9]] - self.default_dof_pos[:,[0, 3, 6, 9]]), dim=-1)
+        standup = self.root_states[:, 2] > self.cfg.rewards.target_base_height_phase3
+        reward = torch.exp(mse * self.cfg.rewards.target_dof_pos_sigma) 
+        reward = reward * standup
+        return reward

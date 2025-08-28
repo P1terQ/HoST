@@ -47,6 +47,7 @@ if __name__ == '__main__':
 
     args.task = 'g1_ground'
     # args.load_run = "/home/ustc/robot/code/recovery-baselines/host_for_go2/legged_gym/logs/g1_ground/Aug26_23-00-02_8-26-0"
-    args.load_run = "/home/ustc/robot/code/recovery-baselines/host_for_go2/legged_gym/logs/g1_ground/Aug28_00-12-16_8-27-1-tunepahse3"
+    # args.load_run = "/home/ustc/robot/code/recovery-baselines/host_for_go2/legged_gym/logs/g1_ground/Aug28_00-12-16_8-27-1-tunepahse3"
+    args.load_run = "/home/ustc/robot/code/recovery-baselines/host_for_go2/legged_gym/logs/g1_ground/Aug28_11-50-03_8-28-0"
 
     play(args)
